@@ -42,6 +42,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         maxAge: 86400000,
+        secure: process.env.NODE_ENV === 'production',
     },
     store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
@@ -150,6 +151,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+    if (req.isAuthenticated()) {
+        return res.redirect('/showcase');
+    }
     if (v == 1) {
         res.render("login-signup.ejs", { err: "Invalid Password! Please try again." });
         v = 0;
@@ -436,9 +440,15 @@ app.post("/sign-up", async (req, res) => {
 });
 
 app.post("/login", passport.authenticate("local", {
-    successRedirect: "/showcase",
+    // successRedirect: "/showcase",
+    // failureRedirect: "/login",
     failureRedirect: "/login",
-}));
+}), (req, res) => {
+    // Redirect to the stored returnTo URL or default to showcase
+    const redirectUrl = req.session.returnTo || '/showcase';
+    delete req.session.returnTo;
+    res.redirect(redirectUrl);
+});
 
 passport.use(new Strategy(async function verify(username, password, cb) {
     v = 0;
@@ -481,6 +491,15 @@ passport.serializeUser((user, cb) => {
 passport.deserializeUser((user, cb) => {
     cb(null, user);
 });
+
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    // Store the requested URL to redirect after login
+    req.session.returnTo = req.originalUrl;
+    res.redirect('/login');
+}
 
 app.listen(port, () => {
     console.log(`Successfully started on port ${port}`);
