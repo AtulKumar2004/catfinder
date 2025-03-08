@@ -10,6 +10,10 @@ import { Strategy } from "passport-local";
 import path from "path";
 import multer from "multer";
 import 'dotenv/config';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import FormData from "form-data";
 import { Readable } from "stream";
@@ -39,6 +43,9 @@ app.use(session({
     }
 }));
 
+app.set("views", path.resolve("views"))
+app.set("view engine", "ejs");
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -48,7 +55,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const db = new pg.Client({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.POSTGRES_URL,
   ssl: {
     rejectUnauthorized: false,
   },
