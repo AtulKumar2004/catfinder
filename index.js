@@ -10,16 +10,13 @@ import { Strategy } from "passport-local";
 import path from "path";
 import multer from "multer";
 import 'dotenv/config';
-import pgSession from 'connect-pg-simple';
-const PgSession = pgSession(session);
-
 
 import FormData from "form-data";
 import { Readable } from "stream";
 import fs from "fs";
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const saltRounds = 10;
 
 const storage = multer.diskStorage({
@@ -34,18 +31,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(session({
-    store: new PgSession({
-        conObject: {
-            connectionString: process.env.DATABASE_URL,
-            ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
-        }
-    }),
-    secret: process.env.SESSION_SECRET || 'TOPSECRETWORD',
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production", // Secure only in production
+        httpOnly: true, // Prevents XSS attacks
+        sameSite: "lax" // Allows cookies to work properly
     }
 }));
 
@@ -59,9 +52,13 @@ app.use(passport.session());
 
 const db = new pg.Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+    ssl: { rejectUnauthorized: false } // Required for Render PostgreSQL
 });
-db.connect();
+
+db.connect()
+  .then(() => console.log("Connected to PostgreSQL"))
+  .catch(err => console.error("Database connection error:", err));
+
 
 let c = 0;
 let v = 0;
