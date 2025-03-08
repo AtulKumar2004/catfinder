@@ -66,6 +66,29 @@ db.connect()
   .then(() => console.log("Connected to PostgreSQL"))
   .catch(err => console.error("Database connection error:", err));
 
+async function connectWithRetry() {
+let retries = 5;
+while (retries) {
+    try {
+        await db.connect();
+        console.log("✅ Database connected successfully!");
+        break; // Exit loop once connected
+    } catch (err) {
+        console.error(`Database connection failed. Retrying in 5s... (${retries} attempts left)`, err);
+        retries -= 1;
+        await new Promise(res => setTimeout(res, 5000)); // Wait 5 seconds before retrying
+    }
+}
+
+if (retries === 0) {
+    console.error("❌ Could not connect to the database after multiple attempts.");
+    process.exit(1); // Exit if connection fails after retries
+}
+}
+
+// Call the function to connect
+connectWithRetry();
+
 
 let c = 0;
 let v = 0;
