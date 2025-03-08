@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>Login</title>
+</head>
+
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        font-family: "Quicksand", sans-serif !important;
+        color: white;
+    }
+
+    body {
+        background-image: url(/styles/kittens.jpg);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: 100% 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        position: relative;
+        width: 750px;
+        height: 450px;
+        border: 2px solid rgb(221, 184, 18);
+        box-shadow: 0 0 25px rgb(221, 184, 18);
+        background-color: #25252b;
+        opacity: 0.8;
+        overflow: hidden;
+    }
+
+    .container .form-box {
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .form-box.Login {
+        left: 0;
+        padding: 0 40px;
+    }
+
+    .form-box.Login .animation {
+        transform: translateX(0%);
+        transition: 0.7s;
+        opacity: 1;
+        transition-delay: calc(.1s * var(--S));
+    }
+
+    .container.active .form-box.Login .animation {
+        transform: translateX(-120%);
+        opacity: 0;
+        transition-delay: calc(.1s * var(--D));
+    }
+
+    .form-box.Register {
+        right: 0;
+        padding: 0 60px;
+    }
+
+    .form-box.Register .animation {
+        transform: translateX(120%);
+        transition: 0.7s ease;
+        opacity: 0;
+        filter: blur(10px);
+        transition-delay: calc(.1s * var(--S));
+    }
+
+    .container.active .form-box.Register .animation {
+        transform: translateX(0%);
+        opacity: 1;
+        filter: blur(0);
+        transition-delay: calc(.1s * var(--li));
+    }
+
+    .form-box h2 {
+        font-size: 32px;
+        text-align: center;
+    }
+
+    .form-box .input-box {
+        position: relative;
+        width: 100%;
+        height: 50px;
+        margin-top: 25px;
+    }
+
+    .input-box input {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        color: #fff;
+        font-weight: 600;
+        border-bottom: 2px solid #fff;
+        padding-right: 23px;
+        transition: 0.5s;
+    }
+
+    .input-box input.mail:focus,
+    .input-box input.mail:valid {
+        border-bottom: 2px solid #ff2770;
+    }
+
+    .input-box input.pass:focus,
+    .input-box input.pass:valid {
+        border-bottom: 2px solid green;
+    }
+
+    .input-box label {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: #fff;
+        transition: 0.5s;
+    }
+
+    .input-box input:focus~label.mail,
+    .input-box input:valid~label.mail {
+        top: -5px;
+        color: #ff2770;
+    }
+
+    .input-box input:focus~label.pass,
+    .input-box input:valid~label.pass {
+        top: -5px;
+        color: green;
+    }
+
+    .input-box i {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        font-size: 18px;
+        transform: translate(-50%);
+        transition: 0.5s;
+    }
+
+    .input-box input:focus~i.mail,
+    .input-box input:valid~i.mail {
+        color: #ff2770;
+    }
+
+    .input-box input:focus~i.pass,
+    .input-box input:valid~i.pass {
+        color: green;
+    }
+
+    .btn {
+        position: relative;
+        width: 100%;
+        height: 45px;
+        background: transparent;
+        border-radius: 40px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        border: 2px solid rgb(255, 136, 0);
+        overflow: hidden;
+        z-index: 1;
+        color: white;
+    }
+
+    .btn::before {
+        content: "";
+        position: absolute;
+        height: 300%;
+        width: 100%;
+        background: linear-gradient(#25252b, rgb(255, 136, 0), #25252b, rgb(255, 136, 0));
+        top: -100%;
+        left: 0;
+        z-index: -1;
+        transition: 0.5s;
+    }
+
+    .btn:hover:before {
+        top: 0;
+    }
+
+    .regi-link {
+        font-size: 14px;
+        text-align: center;
+        margin: 20px 0 10px;
+    }
+
+    .regi-link a {
+        text-decoration: none;
+        color: rgb(255, 136, 0);
+        font-weight: 600;
+    }
+
+    .regi-link a:hover {
+        text-decoration: underline;
+    }
+
+    .info-content {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .info-content.Login {
+        right: 0;
+        text-align: right;
+        padding: 0 40px 60px 150px;
+    }
+
+    .info-content.Login .animation {
+        transform: translateX(0);
+        transition: 0.7s ease;
+        transition-delay: calc(.1s * var(--S));
+        opacity: 1;
+        filter: blur(0px);
+    }
+
+    .container.active .info-content.Login .animation {
+        transform: translateX(120%);
+        opacity: 0;
+        filter: blur(10px);
+        transition-delay: calc(.1s * var(--D));
+    }
+
+    .info-content.Register {
+        left: 0;
+        text-align: left;
+        padding: 0 150px 60px 40px;
+        pointer-events: none;
+    }
+
+    .info-content.Register .animation {
+        transform: translateX(-120%);
+        transition: 0.7s ease;
+        opacity: 0;
+        filter: blur(10px);
+        transition-delay: calc(.1s * var(--S));
+    }
+
+    .container.active .info-content.Register .animation {
+        transform: translateX(0%);
+        opacity: 1;
+        filter: blur(0);
+        transition-delay: calc(.1s * var(--li));
+    }
+
+    .info-content h2 {
+        font-size: 36px;
+        line-height: 1.3;
+    }
+
+    .info-content p {
+        text-transform: uppercase;
+        font-size: 16px;
+    }
+
+    .container .curved-shape {
+        position: absolute;
+        right: 0;
+        top: -5px;
+        height: 600px;
+        width: 850px;
+        background: linear-gradient(45deg, #25252b, rgb(255, 136, 0));
+        transform: rotate(10deg) skewY(40deg);
+        transform-origin: bottom right;
+        transition: 1.5s ease;
+        transition-delay: 1.6s;
+    }
+
+    .container.active .curved-shape {
+        transform: rotate(0deg) skewY(0deg);
+        transition-delay: .5s;
+    }
+
+    .container .curved-shape2 {
+        position: absolute;
+        left: 250px;
+        top: 100%;
+        height: 700px;
+        width: 850px;
+        background-color: #25252b;
+        border-top: 3px solid rgb(255, 136, 0);
+        transform: rotate(0deg) skewY(0deg);
+        transform-origin: bottom left;
+        transition: 1.5s ease;
+        transition-delay: 0.5s;
+    }
+
+    .container.active .curved-shape2 {
+        transform: rotate(-11deg) skewY(-41deg);
+        transition-delay: 1.2s;
+    }
+
+    label.blankspace {
+        width: 100%;
+        position: relative;
+        top: 14.5px;
+        color: red;
+        font-size: 13px;
+        font-weight: 600;
+    }
+</style>
+
+<body>
+    <!-- MAKE A LOGIN FORM -->
+    <div class="container">
+        <div class="curved-shape"></div>
+        <div class="curved-shape2"></div>
+        <div class="form-box Login">
+            <h2 class="animation" style="--D:0; --S:21;">Login</h2>
+            <form action="/login" method="POST">
+                <div class="input-box animation" style="--D:1; --S:22;">
+                    <input type="email" name="username" class="mail offLog" onkeyup="validateEmailLog()" required>
+                    <label for="" class="mail">Email</label>
+                    <i class='bx bxs-envelope mail'></i>
+                </div>
+                <div class="input-box animation" style="--D:2; --S:23;">
+                    <input type="password" name="password" class="pass offLog" required>
+                    <label for="" class="pass">Password</label>
+                    <label for="" style="position: relative !important; top: 9px !important;" class="blankspace"><%= locals.err %></label>
+                    <i class='bx bx-lock pass'></i>
+                </div>
+                <div class="input-box animation" style="--D:3; --S:24;">
+                    <button class="btn" type="submit">Login</button>
+                </div>
+                <div class="regi-link animation" style="--D:4; --S:25;">
+                    <p>Don't have an account ? <a href="#" class="SignUpLink">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="info-content Login">
+            <h2 class="animation" style="--D:0; --S:20;">WELCOME BACK!</h2>
+            <P class="animation" style="--D:1; --S:21;">Please authenticate by giving your credentials</P>
+        </div>
+        <div class="form-box Register">
+            <h2 class="animation" style="--li:17; --S:0;">Sign Up</h2>
+            <form action="/sign-up" method="POST">
+                <div class="input-box animation" style="--li:18; --S:1;">
+                    <input type="email" name="username" class="mail offReg" onkeyup="validateEmailReg()" required>
+                    <label for="" class="mail">Email</label>
+                    <label for="" class="blankspace"><%= locals.error %></label>
+                    <i class='bx bxs-envelope mail'></i>
+                </div>
+                <div class="input-box animation" style="--li:19; --S:2;">
+                    <input type="password" name="password" class="pass offReg" required>
+                    <label for="" class="pass">Password</label>
+                    <i class='bx bx-lock pass'></i>
+                </div>
+                <div class="input-box animation" style="--li:20; --S:3;">
+                    <button class="btn" type="submit">Sign Up</button>
+                </div>
+                <div class="regi-link animation" style="--li:21; --S:4;">
+                    <p>Already have an account? <a href="#" class="LogInLink">Log In</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="info-content Register">
+            <h2 class="animation" style="--li:17; --S:0;">WELCOME BACK!</h2>
+            <P class="animation" style="--li:18; --S:1;">Please authenticate by giving your credentials</P>
+        </div>
+    </div>
+    <script>
+        const container = document.querySelector('.container');
+        const LogInLink = document.querySelector('.LogInLink');
+        const SignUpLink = document.querySelector('.SignUpLink');
+
+        const labelMailReg = document.querySelector('.form-box.Register label.mail');
+        const inputMailReg = document.querySelector('.form-box.Register input.mail');
+        const iMailReg = document.querySelector('.form-box.Register i.mail');
+
+        const labelMailLog = document.querySelector('.form-box.Login label.mail');
+        const inputMailLog = document.querySelector('.form-box.Login input.mail');
+        const iMailLog = document.querySelector('.form-box.Login i.mail');
+
+
+        if ('<%= locals.value %>' == "up") {
+            container.classList.add('active');
+        }
+
+        document.querySelector('.Register label.blankspace').textContent = '<%= locals.error %>';
+        document.querySelector('.Login label.blankspace').textContent = '<%= locals.err %>';
+
+        let labelErrLog = document.querySelector('.Login label.blankspace');
+        let labelErrReg = document.querySelector('.Register label.blankspace');
+
+        let listLog = document.querySelectorAll('input.offLog');
+        let listReg = document.querySelectorAll('input.offReg');
+
+        listLog.forEach((ele) => {
+            ele.addEventListener('click',()=> {
+                labelErrLog.innerHTML = '';
+            });
+        });
+
+        listReg.forEach((ele) => {
+            ele.addEventListener('click',()=> {
+                labelErrReg.innerHTML = '';
+            });
+        });
+
+        function validateEmailReg() {
+            if (!inputMailReg.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
+                inputMailReg.style.borderBottom = "2px solid #ff2770";
+                iMailReg.style.color = "#ff2770";
+                labelMailReg.style.color = "#ff2770";
+                return false;
+            }
+            inputMailReg.style.borderBottom = "2px solid green";
+            iMailReg.style.color = "green";
+            labelMailReg.style.color = "green";
+            return true;
+        }
+
+        function validateEmailLog() {
+            if (!inputMailLog.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)) {
+                inputMailLog.style.borderBottom = "2px solid #ff2770";
+                iMailLog.style.color = "#ff2770";
+                labelMailLog.style.color = "#ff2770";
+                return false;
+            }
+            inputMailLog.style.borderBottom = "2px solid green";
+            iMailLog.style.color = "green";
+            labelMailLog.style.color = "green";
+            return true;
+        }
+
+        SignUpLink.addEventListener('click', () => {
+            container.classList.add('active');
+        });
+        LogInLink.addEventListener('click', () => {
+            container.classList.remove('active');
+        });
+    </script>
+</body>
+
+</html>

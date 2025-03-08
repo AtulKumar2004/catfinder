@@ -1,0 +1,280 @@
+<%- include("partials/header.ejs") %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <script src="https://kit.fontawesome.com/22d10a4416.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="styles/output.css">
+        <title>Cats</title>
+    </head>
+    <style>
+        .applyBG {
+            background-color: rgb(217, 226, 234);
+            z-index: -10 !important;
+        }
+
+        div.element::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -100px;
+            height: 100%;
+            width: 100%;
+            background-image: url("styles/bg-cat-image.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index: -1;
+            opacity: 0.55;
+        }
+
+        .btnh1 {
+            outline: none;
+            transition: color 0.3s ease;
+        }
+    </style>
+
+    <body>
+        <div class="heightFull  h-[27rem] w-full flex flex-col justify-center items-center">
+            <div class="element flex justify-center items-center">
+                <p class="text-slate-800 font-extrabold text-2xl md:text-4xl">Browse the <span
+                        class="bg-yellow-500 text-white px-1">"Cat Train"</span>
+                    below</p>
+            </div>
+            <div class="mt-4">
+                <form action="/search" method="POST">
+                    <button type="submit">
+                        <i class='text-white text-4xl outline-none relative top-3 bx bx-search cursor-pointer'></i>
+                    </button>
+                    <input type="text" class="px-3 py-3 rounded-xl focus:outline-none" name="animalid"
+                        placeholder="Search by Id" required>
+                </form>
+            </div>
+        </div>
+        <div class="applyBG">
+            <div class="flex flex-col items-center justify-center my-6">
+                <p class="text-[#009879] font-bold text-3xl mb-2 mt-6">Kitties you may want to adopt!</p>
+                <p class="bg-yellow-600 w-64 text-center h-1"></p>
+            </div>
+            <div class="w-full h-full flex flex-wrap justify-center">
+                <% if(locals.listOfCats){ %>
+
+                    <% for(let i=0;i<listOfCats.length;i++) { %>
+                        <% let imgURL=listOfCats[i].url; %>
+                            <% let info=listOfCats[i].breeds[0]; %>
+
+                                <div
+                                    class="max-w-sm rounded overflow-hidden shadow-lg mx-3 my-4 bg-slate-300 hover:bg-blue-100">
+                                    <img class="w-full h-[23rem]" src="<%= imgURL %>" alt="A Cat">
+                                    <div class="px-6 py-4 flex flex-col justify-start items-start relative">
+                                        <div class="font-bold text-xl mb-2">
+                                            <%= info.name %>
+                                        </div>
+                                        <p class="text-gray-700 text-base mb-2">
+                                            <%= info.description %>
+                                        </p>
+                                        <p class="font-semibold">Breed Id: <span class="text-gray-700 text-base">
+                                                <%= info.id %>
+                                            </span></p>
+                                        <p class="font-semibold">Origin: <span class="text-gray-700 text-base">
+                                                <%= info.origin %>
+                                            </span></p>
+                                        <p class="font-semibold">Lifespan: <span class="text-gray-700 text-base">
+                                                <%= info.life_span %>
+                                            </span></p>
+                                        <p class="font-semibold">Adaptability: <span class="text-gray-700 text-base">
+                                                <%= info.adaptability %>
+                                            </span></p>
+                                        <p class="font-semibold">Health Issues: <span class="text-gray-700 text-base">
+                                                <%= info.health_issues %>
+                                            </span></p>
+                                        <p class="font-semibold">Intelligence: <span class="text-gray-700 text-base">
+                                                <%= info.intelligence %>
+                                            </span></p>
+                                        <p class="font-semibold">Affection Level: <span class="text-gray-700 text-base">
+                                                <%= info.affection_level %>
+                                            </span></p>
+                                        <p class="font-semibold">Child Friendly: <span class="text-gray-700 text-base">
+                                                <%= info.child_friendly %>
+                                            </span></p>
+                                        <p class="font-semibold">Energy Level: <span class="text-gray-700 text-base">
+                                                <%= info.energy_level %>
+                                            </span></p>
+                                        <p class="font-semibold">Social Needs: <span class="text-gray-700 text-base">
+                                                <%= info.social_needs %>
+                                            </span></p>
+                                        <p class="font-semibold">Stranger Friendly: <span
+                                                class="text-gray-700 text-base">
+                                                <%= info.stranger_friendly %>
+                                            </span></p>
+                                        <p class="font-semibold">Wikipedia URL: <span class="text-gray-700 text-base"><a
+                                                    class="text-blue-500 hover:underline"
+                                                    href="<%= info.wikipedia_url %>">
+                                                    <%= info.name %>
+                                                </a></span></p>
+                                        <form class="formdata">
+                                            <button class="btn absolute text-2xl bottom-8 btnh1 right-8"
+                                                id="<%= listOfCats[i].id %>" name="anId"
+                                                value="<%= listOfCats[i].id %>"><i
+                                                    class="fa-solid fa-heart"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <% } %>
+                                    <% } else if(locals.oneCat && !locals.oneCat.sub_id) {%>
+                                        <% let oneCatInfo=oneCat.breeds[0] %>
+                                            <div
+                                                class="h-[80%] md:w-[85%] md:flex-row md:justify-start rounded overflow-hidden mb-5 hover:bg-blue-100 mt-2 w-[80%] sm:w-[65%] shadow-lg flex flex-col justify-center items-center relative">
+                                                <img class="h-[18rem] md:h-[19.5rem] w-full rounded md:w-[30%] md:ml-1 ml-3 "
+                                                    src="<%= oneCat.url%>" alt="Required Cat Image">
+                                                <div class="w-full md:w-[70%] px-6 py-4">
+                                                    <div class="flex flex-col justify-center items-center">
+                                                        <p class="font-bold text-xl mb-2">
+                                                            <%= oneCatInfo.name %>
+                                                        </p>
+                                                        <p class="text-gray-700 text-base mb-2">
+                                                            <%= oneCatInfo.description %>
+                                                        </p>
+                                                    </div>
+                                                    <div
+                                                        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-2">
+                                                        <p class="font-semibold">Breed Id: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.id %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Origin: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.origin %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Lifespan: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.life_span %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Adaptability: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.adaptability %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Health Issues: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.health_issues %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Intelligence: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.intelligence %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Affection Lev: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.affection_level %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Child Friendly: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.child_friendly %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Energy Level: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.energy_level %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Social Needs: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.social_needs %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Stranger Friendly: <span
+                                                                class="text-gray-700 text-base">
+                                                                <%= oneCatInfo.stranger_friendly %>
+                                                            </span></p>
+                                                        <p class="font-semibold">Wikipedia URL: <span
+                                                                class="text-gray-700 text-base"><a
+                                                                    class="text-blue-500 hover:underline"
+                                                                    href="<%= oneCatInfo.wikipedia_url %>">
+                                                                    <%= oneCatInfo.name %>
+                                                                </a></span></p>
+                                                        <form class="formdata">
+                                                            <button
+                                                                class="btn absolute md:bottom-[88%] text-2xl bottom-8 right-8 btnh1"
+                                                                id="<%= oneCat.id %>" name="anId"
+                                                                value="<%= oneCat.id %>"><i
+                                                                    class="fa-solid fa-heart"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% } else if(locals.oneCat && locals.oneCat.sub_id) { %>
+                                                <div
+                                                    class="h-[80%] my-4 w-[50%] flex flex-col justify-center items-center relative">
+                                                    <img class="h-[25rem] w-[50%] rounded ml-3 shadow-lg"
+                                                        src="<%= oneCat.url%>" alt="Required Cat Image">
+                                                </div>
+
+                                                <% } else {%>
+                                                    <div
+                                                        class="w-[50%] h-[15%] flex mb-3 flex-col justify-center items-center">
+                                                        <img class="mix-blend-color-burn z-3 relative bottom-12"
+                                                            src="styles/no-data.png" alt="Not Found Image">
+                                                        <p
+                                                            class="text-black text-lg z-4 font-bold relative bottom-10 mb-2">
+                                                            <%= locals.NotFound %>☹️
+                                                        </p>
+                                                    </div>
+                                                    <% } %>
+
+            </div>
+        </div>
+        <script>
+
+            let Favourite = document.querySelectorAll(".btnh1");
+            Favourite.forEach((button) => {
+                button.style.color = "grey";
+                button.addEventListener('click', async (event) => {
+                    if (button.style.color == "grey") {
+                        button.style.color = "red";
+                    } else {
+                        button.style.color = "grey";
+                    }
+                });
+            });
+
+            let form = document.querySelectorAll("form.formdata");
+            form.forEach((formData) => {
+                formData.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    console.log(event.view.document.activeElement.attributes[3].value);
+                    const data = {
+                        data: event.view.document.activeElement.attributes[3].value,
+                    };
+                    try {
+                        const response = await fetch('/save', {
+                            method: 'POST',
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(data),
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            console.log(result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error saving data:', error);
+                    }
+                });
+            });
+
+            console.log("Hello");
+            console.log('<%= locals.kitties %>'.split(","));
+            console.log('<%=locals.favs%>'.split(","));
+            const listCats = '<%= locals.kitties %>'.split(",");
+            const favourites = '<%= locals.favs %>'.split(",");
+            listCats.forEach((Cat) => {
+                favourites.forEach((fav) => {
+                    if (Cat == fav) {
+                        console.log(document.getElementById(Cat));
+                        document.getElementById(Cat).style.color = "red";
+                    }
+                });
+            });
+        </script>
+    </body>
+
+    </html>
+    <%- include("partials/footer.ejs") %>

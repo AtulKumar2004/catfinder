@@ -1,0 +1,32 @@
+<%- include("partials/header.ejs") %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://kit.fontawesome.com/22d10a4416.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="styles/output.css">
+</head>
+
+<body>
+    <div class="flex flex-col">
+        <div class="flex flex-col justify-center items-center m-3">
+            <p class="font-bold text-3xl text-[#009879]">List of all Ids:</p>
+            <p class="bg-yellow-600 w-32 text-center h-1"></p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-x-2 gap-y-3 text-black pl-5 m-8">
+            <% for(i=0;i<idList.length;i++) { %>
+                <p class="font-semibold"><%=idList[i]%></p>
+            <% } %>
+        </div>
+    </div>
+</body>
+
+</html>
+<%- include("partials/footer.ejs") %>

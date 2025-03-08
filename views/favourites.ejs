@@ -1,0 +1,154 @@
+<%- include("partials/header.ejs") %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Favourites</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <script src="https://kit.fontawesome.com/22d10a4416.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="styles/output.css">
+    </head>
+    <style>
+        * {
+            font-family: "Quicksand", "sans-serif";
+        }
+    </style>
+
+    <body>
+        <% if(locals.CatList) {%>
+            <div class="w-[100%] flex my-6 flex-col justify-center items-center">
+                <p class="text-yellow-600 text-3xl font-bold">Your Favourites</p>
+                <p class="bg-[#009879] w-32 text-center h-1"></p>
+            </div>
+            <% } %>
+                <div class="w-full h-full flex flex-wrap justify-center">
+                    <% if(locals.CatList) {%>
+                        <% for(let i=0;i<CatList.length;i++) { %>
+                            <% let imgURL=CatList[i].url; %>
+                                <% let info=CatList[i].breeds[0]; %>
+
+                                    <div
+                                        class="max-w-sm rounded overflow-hidden shadow-lg mx-3 my-4 bg-slate-300 hover:bg-blue-100">
+                                        <img class="w-full h-[23rem]" src="<%= imgURL %>" alt="A Cat">
+                                        <div class="px-6 py-4 flex flex-col justify-start items-start relative">
+                                            <div class="font-bold text-xl mb-2">
+                                                <%= info.name %>
+                                            </div>
+                                            <p class="text-gray-700 text-base mb-2">
+                                                <%= info.description %>
+                                            </p>
+                                            <p class="font-semibold">Breed Id: <span class="text-gray-700 text-base">
+                                                    <%= info.id %>
+                                                </span></p>
+                                            <p class="font-semibold">Origin: <span class="text-gray-700 text-base">
+                                                    <%= info.origin %>
+                                                </span></p>
+                                            <p class="font-semibold">Lifespan: <span class="text-gray-700 text-base">
+                                                    <%= info.life_span %>
+                                                </span></p>
+                                            <p class="font-semibold">Adaptability: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.adaptability %>
+                                                </span></p>
+                                            <p class="font-semibold">Health Issues: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.health_issues %>
+                                                </span></p>
+                                            <p class="font-semibold">Intelligence: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.intelligence %>
+                                                </span></p>
+                                            <p class="font-semibold">Affection Level: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.affection_level %>
+                                                </span></p>
+                                            <p class="font-semibold">Child Friendly: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.child_friendly %>
+                                                </span></p>
+                                            <p class="font-semibold">Energy Level: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.energy_level %>
+                                                </span></p>
+                                            <p class="font-semibold">Social Needs: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.social_needs %>
+                                                </span></p>
+                                            <p class="font-semibold">Stranger Friendly: <span
+                                                    class="text-gray-700 text-base">
+                                                    <%= info.stranger_friendly %>
+                                                </span></p>
+                                            <p class="font-semibold">Wikipedia URL: <span
+                                                    class="text-gray-700 text-base"><a
+                                                        class="text-blue-500 hover:underline"
+                                                        href="<%= info.wikipedia_url %>">
+                                                        <%= info.name %>
+                                                    </a></span></p>
+                                            <form class="formdata">
+                                                <button class="btn absolute text-2xl bottom-8 btnh1 right-8"
+                                                    id="<%= CatList[i].id %>" name="anId"
+                                                    value="<%= CatList[i].id %>"><i
+                                                        class="fa-solid fa-heart"></i></button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <% } %>
+
+                                        <% } else { %>
+                                            <div class="w-[50%] h-[15%] flex mb-3 flex-col justify-center items-center">
+                                                <img class="mix-blend-color-burn h-[100%] w-[100%] my-4"
+                                                    src="styles/no-data.png" alt="Not Found Image">
+                                                <p class="text-black text-lg font-bold mb-2">
+                                                    <%= locals.NoCatFound %>
+                                                </p>
+                                            </div>
+                                            <% } %>
+
+                </div>
+    </body>
+    <script>
+        let Favourite = document.querySelectorAll(".btnh1");
+        Favourite.forEach((button) => {
+            button.style.color = "red";
+            button.addEventListener('click', async (event) => {
+                if (button.style.color == "grey") {
+                    button.style.color = "red";
+                } else {
+                    button.style.color = "grey";
+                }
+            });
+        });
+
+        let form = document.querySelectorAll("form.formdata");
+        form.forEach((formData) => {
+            formData.addEventListener('click', async (event) => {
+                event.preventDefault();
+                console.log(event.view.document.activeElement.attributes[3].value);
+                const data = {
+                    data: event.view.document.activeElement.attributes[3].value,
+                };
+                try {
+                    const response = await fetch('/save', {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data),
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                }
+            });
+        });
+    </script>
+
+    </html>
+    <%- include("partials/footer.ejs") %>

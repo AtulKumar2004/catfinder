@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://kit.fontawesome.com/22d10a4416.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="styles/output.css">
+    <title>CatFinder</title>
+</head>
+<style>
+    * {
+        font-family: "Quicksand", "sans-serif";
+    }
+
+    @media(min-width: 640px) {
+        .hamburger {
+            display: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .menu {
+            position: fixed;
+            transform: translateY(-100%);
+            z-index: 1;
+            right: 0;
+            top: 0;
+            background: #334155;
+            padding-top: 4rem;
+        }
+
+        .hamburger > .closeIcon {
+            display: none;
+        }
+
+        .showMenu {
+            transform: translateY(0);
+            display: flex;
+            flex-direction: column;
+            max-width: 35%;
+            height: 18rem !important;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-left: 40px;
+        }
+
+        .showMenu>li:nth-child(5) {
+            margin-bottom: 12px;
+        }
+    }
+</style>
+
+<body>
+    <!-- navbar goes here -->
+    <nav class="w-full h-16 bg-slate-700 flex justify-between items-center px-4">
+        <a class="text-[#DFF2EB] font-bold text-3xl hover:text-green-300" href="/showcase">CatFinder🐈‍</a>
+        <ul class="w-[60%] flex justify-around font-bold text-white menu">
+            <li><a class="hover:text-yellow-600 menuItem" href="/uploads">Uploads</a></li>
+            <li><a class="hover:text-yellow-600 menuItem" href="/myFavs">Favourites</a></li>
+            <li><a class="hover:text-yellow-600 menuItem" href="/searchBreeds">Breeds</a></li>
+            <li><a class="hover:text-yellow-600 menuItem" href="/displayId">IDs</a></li>
+            <li><a class="hover:text-yellow-600 menuItem" href="/about">About</a></li>
+        </ul>
+        <button class="hamburger z-20">
+            <i class='menuIcon bx bx-menu text-white text-4xl'></i>
+            <i class="fa-solid closeIcon text-white text-4xl fa-xmark"></i>
+        </button>
+    </nav>
+
+    <script>
+        const menu = document.querySelector(".menu");
+        const menuItems = document.querySelectorAll(".menuItem");
+        const hamburger = document.querySelector(".hamburger");
+        const closeIcon = document.querySelector(".closeIcon");
+        const menuIcon = document.querySelector(".menuIcon");
+
+        function toggleMenu() {
+            if (menu.classList.contains("showMenu")) {
+                menu.classList.remove("showMenu");
+                closeIcon.style.display = "none";
+                menuIcon.style.display = "block";
+            } else {
+                menu.classList.add("showMenu");
+                closeIcon.style.display = "block";
+                menuIcon.style.display = "none";
+            }
+        }
+
+        hamburger.addEventListener("click", toggleMenu);
+    </script>
+</body>
+
+</html>

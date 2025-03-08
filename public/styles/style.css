@@ -1,0 +1,64 @@
+* {
+  padding: 0;
+  margin: 0;
+  font-family: "Quicksand",sans-serif !important;
+}
+
+body {
+  background-image: url('../styles/bg-cat.png');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 100% 100%;
+}
+
+img:hover {
+  transform: scale(1.1);
+}
+
+img {
+  height: 270px !important;
+  width: 270px !important; 
+  border: 5px solid orange;
+  border-radius: 50%;
+  position: relative;
+  left: 55px;
+  bottom: 30px;
+  transition: 0.6s ease;
+}
+
+.slide-up {
+  position: relative;
+  bottom: 1.7rem;
+}
+
+button {
+  background-color: orange !important;
+  padding: 10px !important;
+  color: white !important;
+  font-weight: bold !important;
+}
+
+a > h1 {
+  color: black;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+.account {
+  text-align: right;
+}
+
+.logo,.logo-title,.account {
+  display: inline;
+}
+
+.account {
+  width: 80%;
+  display: inline-flex;
+  justify-content: flex-end;
+  position: relative;
+  bottom: 0.6rem;
+}

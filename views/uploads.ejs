@@ -1,0 +1,58 @@
+<%- include("partials/header.ejs") %>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+        <script src="https://kit.fontawesome.com/22d10a4416.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="styles/output.css">
+        <title>Uploads</title>
+    </head>
+
+    <body>
+        <div class="my-4 flex justify-center items-center">
+            <p class="text-lg font-bold mx-4">Upload your cat image:</p>
+            <form action="/submit-image" method="POST" enctype="multipart/form-data">
+                <input type="file"
+                    class="file-upload-input py-4 w-[65%] text-center pl-5 text-xl text-white bg-slate-500 mr-4"
+                    onchange="readURL(this)" accept="Image/*" name="image">
+                <button type="submit" class="p-5 bg-green-500 hover:bg-green-400 text-white rounded font-bold text-lg">Submit</button>
+            </form>
+        </div>
+        <hr>
+        <% if(locals.errorMessage) { %>
+        <div class="h-[40rem] flex justify-center items-center">
+            <label class="text-red-600 font-bold text-xl" for=""><%= locals.errorMessage %></label>
+        </div>
+        <% } %>
+        <% if(locals.message) { %>
+            <div class="flex flex-col justify-center items-center my-4">
+
+                <img src="styles/no-image.png" class="mix-blend-color-burn h-[22rem] w-[22rem]" alt="No images yet">
+                <p class="text-slate-700 text-xl font-bold">
+                    <%= message %>
+                </p>
+            </div>
+            <% } else if(locals.upload) { %>
+                <div class="w-full h-full flex flex-wrap justify-center my-3">
+                    <% for(let i=0;i<upload.length;i++) { %>
+                    <div class="max-w-sm rounded overflow-hidden shadow-lg mx-3 my-4 bg-slate-300 hover:bg-blue-100">
+                        <img class="w-full h-[23rem]" src="<%= upload[i].url %>" alt="A Cat">
+                        <div class="flex justify-around items-center">
+                            <p class="text-black font-bold">Id: <span class="text-base text-slate-500"><%= upload[i].id %></span></p>
+                            <form action="/delete" method="POST">
+                                <button
+                                    class="p-4 my-3 font-bold rounded border-2 border-red-500 bg-white text-red-600 hover:bg-red-600 hover:text-white"
+                                    type="submit" name="id" value="<%= upload[i].id %>">Delete</button>
+                            </form>
+                        </div>                   
+                    </div>
+                <% } %>
+                </div>
+                <% } %>
+    </body>
+
+    </html>
+    <%- include("partials/footer.ejs") %>
