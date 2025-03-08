@@ -11,6 +11,7 @@ import path from "path";
 import multer from "multer";
 import 'dotenv/config';
 import { fileURLToPath } from "url";
+import Memorystore from "memorystore";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,14 +34,18 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+const MemoryStore = Memorystore(session); 
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24,
-    }
+        maxAge: 86400000,
+    },
+    store: new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    }),
 }));
 
 app.use(bodyParser.json());
