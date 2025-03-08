@@ -11,7 +11,7 @@ import path from "path";
 import multer from "multer";
 import 'dotenv/config';
 import { fileURLToPath } from "url";
-import Memorystore from "memorystore";
+import memorystore from "memorystore";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-const MemoryStore = Memorystore(session); 
+const MemoryStore = memorystore(session); 
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -60,16 +60,81 @@ app.set("view engine", "ejs");
 app.use(passport.initialize());
 app.use(passport.session());
 
-const db = new pg.Client({
-    connectionString: process.env.POSTGRES_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+// const db = new pg.Client({
+//     connectionString: process.env.POSTGRES_URL,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
 
-db.connect()
-  .then(() => console.log("Connected to PostgreSQL"))
-  .catch(err => console.error("Database connection error:", err));
+// db.connect()
+//   .then(() => console.log("Connected to PostgreSQL"))
+//   .catch(err => console.error("Database connection error:", err));
+let db = null;
+
+// Function to connect to database with retry logic
+const connectToDatabase = async (retries = 5, delay = 5000) => {
+    let attempts = 0;
+    
+    while (attempts < retries) {
+        try {
+            // Create a new client instance each time
+            db = new pg.Client({
+                connectionString: process.env.POSTGRES_URL,
+                ssl: {
+                    rejectUnauthorized: false,
+                },
+            });
+            
+            // Connect to the database
+            await db.connect();
+            console.log("Connected to PostgreSQL");
+            return db;
+        } catch (err) {
+            attempts++;
+            console.error(`Database connection failed. Retrying in ${delay/1000}s... (${retries - attempts} attempts left)`);
+            console.error(err);
+            
+            // Clean up any partial connection
+            if (db) {
+                try {
+                    await db.end();
+                } catch (endErr) {
+                    // Ignore any errors during cleanup
+                }
+            }
+            
+            if (attempts >= retries) {
+                console.error("Max connection attempts reached. Could not connect to database.");
+                throw err;
+            }
+            
+            // Wait before next attempt
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+};
+
+// Initial connection attempt when server starts
+connectToDatabase()
+    .catch(err => {
+        console.error("Failed to establish initial database connection:", err);
+        process.exit(1); // Exit if we can't connect to the database
+    });
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    console.log("Shutting down server...");
+    if (db) {
+        try {
+            await db.end();
+            console.log("Database connection closed");
+        } catch (err) {
+            console.error("Error closing database connection:", err);
+        }
+    }
+    process.exit(0);
+});
 
 let c = 0;
 let v = 0;
