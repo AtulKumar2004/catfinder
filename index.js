@@ -439,15 +439,43 @@ app.post("/sign-up", async (req, res) => {
     }
 });
 
-app.post("/login", passport.authenticate("local", {
-    // successRedirect: "/showcase",
-    // failureRedirect: "/login",
-    failureRedirect: "/login",
-}), (req, res) => {
-    // Redirect to the stored returnTo URL or default to showcase
-    const redirectUrl = req.session.returnTo || '/showcase';
-    delete req.session.returnTo;
-    res.redirect(redirectUrl);
+// app.post("/login", passport.authenticate("local", {
+//     // successRedirect: "/showcase",
+//     // failureRedirect: "/login",
+//     failureRedirect: "/login",
+// }), (req, res) => {
+//     // Redirect to the stored returnTo URL or default to showcase
+//     const redirectUrl = req.session.returnTo || '/showcase';
+//     delete req.session.returnTo;
+//     res.redirect(redirectUrl);
+// });
+
+app.post("/login", (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+        if (err) {
+            console.error("Authentication error:", err);
+            return next(err);
+        }
+        
+        if (!user) {
+            // Log the reason for failure
+            console.log("Login failed:", info.message);
+            v = info.v || 1;
+            return res.redirect("/login");
+        }
+        
+        req.logIn(user, (err) => {
+            if (err) {
+                console.error("Login error:", err);
+                return next(err);
+            }
+            
+            // Successful login
+            const redirectUrl = req.session.returnTo || '/showcase';
+            delete req.session.returnTo;
+            return res.redirect(redirectUrl);
+        });
+    })(req, res, next);
 });
 
 passport.use(new Strategy(async function verify(username, password, cb) {
@@ -463,15 +491,14 @@ passport.use(new Strategy(async function verify(username, password, cb) {
             bcrypt.compare(password, storedHashedPassword, (err, result) => {
                 if (err) {
                     return cb(err);
-                } else {
-                    console.log(result);
-                    if (result) {
-                        return cb(null, user);
-                    } else {
-                        v = 1;
-                        console.log("Invalid password!");
-                        return cb(null, false);
-                    }
+                }
+                console.log("Password matching result",result);
+                if (result) {
+                    return cb(null, user);
+                } else{
+                    v = 1;
+                    console.log("Invalid password!");
+                    return cb(null, false);
                 }
             });
         } else {
