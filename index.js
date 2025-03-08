@@ -47,7 +47,6 @@ app.use(session({
     saveUninitialized: false, // Do not create empty sessions
     cookie: {
         maxAge: 86400000, // 1 day
-        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
         httpOnly: true, // Prevent client-side access
         sameSite: "lax", // Prevent CSRF
     },
