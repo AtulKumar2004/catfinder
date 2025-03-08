@@ -10,6 +10,9 @@ import { Strategy } from "passport-local";
 import path from "path";
 import multer from "multer";
 import 'dotenv/config';
+import pgSession from 'connect-pg-simple';
+const PgSession = pgSession(session);
+
 
 import FormData from "form-data";
 import { Readable } from "stream";
@@ -31,9 +34,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(session({
+    store: new PgSession({
+        conObject: {
+            connectionString: process.env.DATABASE_URL,
+            ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
+        }
+    }),
     secret: process.env.SESSION_SECRET || 'TOPSECRETWORD',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24,
         secure: process.env.NODE_ENV === "production"
@@ -49,11 +58,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const db = new pg.Client({
-    user: process.env.PG_USER,
-    host: process.env.PG_HOST,
-    database: process.env.PG_DATABASE,
-    password: process.env.PG_PASSWORD,
-    port: process.env.PG_PORT,
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 db.connect();
 
