@@ -42,6 +42,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         maxAge: 86400000,
+        secure: process.env.NODE_ENV === 'production'
     },
     store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
@@ -517,15 +518,6 @@ passport.serializeUser((user, cb) => {
 passport.deserializeUser((user, cb) => {
     cb(null, user);
 });
-
-function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    // Store the requested URL to redirect after login
-    req.session.returnTo = req.originalUrl;
-    res.redirect('/login');
-}
 
 app.listen(port, () => {
     console.log(`Successfully started on port ${port}`);
