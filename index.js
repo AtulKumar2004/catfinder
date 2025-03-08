@@ -488,26 +488,29 @@ passport.use(new Strategy(async function verify(username, password, cb) {
         if (result.rows.length > 0) {
             const user = result.rows[0];
             const storedHashedPassword = user.password;
-            bcrypt.compare(password, storedHashedPassword, (err, result) => {
-                if (err) {
-                    return cb(err);
-                }
-                console.log("Password matching result",result);
-                if (result) {
+            try {
+                // Using a Promise-based approach instead of callback
+                const isMatch = await bcrypt.compare(password, storedHashedPassword);
+                console.log("Password match result:", isMatch);
+                
+                if (isMatch) {
                     return cb(null, user);
-                } else{
+                } else {
                     v = 1;
-                    console.log("Invalid password!");
-                    return cb(null, false);
+                    return cb(null, false, { message: "Invalid password" });
                 }
-            });
+            } catch (bcryptErr) {
+                console.error("bcrypt error:", bcryptErr);
+                return cb(bcryptErr);
+            }
         } else {
             v = 2;
-            console.log("User does not exist!");
-            return cb(null, false);
+            console.log("User not found in database");
+            return cb(null, false, { message: "User does not exist" });
         }
-    } catch (err) {
-        return cb(err);
+    } catch (dbErr) {
+        console.error("Database error:", dbErr);
+        return cb(dbErr);
     }
 }));
 
