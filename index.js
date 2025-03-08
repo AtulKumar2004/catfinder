@@ -12,6 +12,7 @@ import multer from "multer";
 import 'dotenv/config';
 import { fileURLToPath } from "url";
 import memorystore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,21 +35,23 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-const MemoryStore = memorystore(session); 
-
+const PgSession = connectPgSimple(session);
+const safePruneInterval = Math.min(60 * 60 * 1000, 2_000_000_000); 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 86400000,
-        secure: process.env.NODE_ENV === 'production'
-    },
-    store: new MemoryStore({
-        checkPeriod: 86400000 // prune expired entries every 24h
+    store: new PgSession({
+        conString: process.env.POSTGRES_URL, // PostgreSQL connection string
+        tableName: "session", // Table to store sessions
     }),
+    secret: process.env.SESSION_SECRET, // Keep this secret
+    resave: false, // Do not save session if unchanged
+    saveUninitialized: false, // Do not create empty sessions
+    cookie: {
+        maxAge: 86400000, // 1 day
+        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        httpOnly: true, // Prevent client-side access
+        sameSite: "lax", // Prevent CSRF
+    },
 }));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(express.static("public"));
@@ -61,81 +64,16 @@ app.set("view engine", "ejs");
 app.use(passport.initialize());
 app.use(passport.session());
 
-// const db = new pg.Client({
-//     connectionString: process.env.POSTGRES_URL,
-//   ssl: {
-//     rejectUnauthorized: false,
-//   },
-// });
-
-// db.connect()
-//   .then(() => console.log("Connected to PostgreSQL"))
-//   .catch(err => console.error("Database connection error:", err));
-let db = null;
-
-// Function to connect to database with retry logic
-const connectToDatabase = async (retries = 5, delay = 5000) => {
-    let attempts = 0;
-    
-    while (attempts < retries) {
-        try {
-            // Create a new client instance each time
-            db = new pg.Client({
-                connectionString: process.env.POSTGRES_URL,
-                ssl: {
-                    rejectUnauthorized: false,
-                },
-            });
-            
-            // Connect to the database
-            await db.connect();
-            console.log("Connected to PostgreSQL");
-            return db;
-        } catch (err) {
-            attempts++;
-            console.error(`Database connection failed. Retrying in ${delay/1000}s... (${retries - attempts} attempts left)`);
-            console.error(err);
-            
-            // Clean up any partial connection
-            if (db) {
-                try {
-                    await db.end();
-                } catch (endErr) {
-                    // Ignore any errors during cleanup
-                }
-            }
-            
-            if (attempts >= retries) {
-                console.error("Max connection attempts reached. Could not connect to database.");
-                throw err;
-            }
-            
-            // Wait before next attempt
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-};
-
-// Initial connection attempt when server starts
-connectToDatabase()
-    .catch(err => {
-        console.error("Failed to establish initial database connection:", err);
-        process.exit(1); // Exit if we can't connect to the database
-    });
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-    console.log("Shutting down server...");
-    if (db) {
-        try {
-            await db.end();
-            console.log("Database connection closed");
-        } catch (err) {
-            console.error("Error closing database connection:", err);
-        }
-    }
-    process.exit(0);
+const db = new pg.Client({
+    connectionString: process.env.POSTGRES_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
+
+db.connect()
+  .then(() => console.log("Connected to PostgreSQL"))
+  .catch(err => console.error("Database connection error:", err));
 
 let c = 0;
 let v = 0;
@@ -173,6 +111,24 @@ app.get("/sign-up", (req, res) => {
         res.render("login-signup.ejs", { value: "up" });
     }
 });
+
+app.use(
+    session({
+      store: new PgSession({
+        conObject: db, // Pass the db connection
+        tableName: "session", // Name of session table
+      }),
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false, // Do not save empty sessions
+      cookie: {
+        maxAge: 86400000, // 1 day
+        secure: process.env.NODE_ENV === "production", // HTTPS only in production
+        httpOnly: true, // Protects against XSS
+        sameSite: "lax", // Protects against CSRF
+      },
+    })
+  );
 
 app.get("/showcase", async (req, res) => {
     // console.log(req.user);
@@ -471,8 +427,7 @@ app.post("/login", (req, res, next) => {
             }
             
             // Successful login
-            const redirectUrl = req.session.returnTo || '/showcase';
-            delete req.session.returnTo;
+            const redirectUrl = '/showcase';
             return res.redirect(redirectUrl);
         });
     })(req, res, next);
